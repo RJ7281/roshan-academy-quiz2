@@ -1,0 +1,49 @@
+ function showQuestion() {
+          console.log(
+            "Showing question",
+            currentQuestionIndex + 1,
+            "of",
+            questions.length,
+            "at 06:58 PM IST, June 20, 2025",
+          );
+          clearInterval(timer);
+          document.getElementById("timer")?.remove();
+          const question = questions[currentQuestionIndex];
+          questionElement.textContent = `Question ${
+            currentQuestionIndex + 1
+          } of ${questions.length}: ${question.question}`;
+          optionsElement.innerHTML = "";
+          question.options.forEach((option) => {
+            const button = document.createElement("button");
+            button.textContent = option;
+            button.classList.add(
+              "w-full",
+              "p-2",
+              "border",
+              "border-gray-300",
+              "rounded-md",
+              "hover:bg-gray-100",
+            );
+            button.addEventListener("click", () => checkAnswer(option));
+            optionsElement.appendChild(button);
+          });
+          quizFeedback.textContent = "";
+          nextQuestionButton.classList.add("hidden");
+          startTimer();
+        }
+
+
+
+
+
+        <div id="quiz-screen" class="hidden">
+  <div class="progress-container">
+    <div id="progress-bar" class="progress-bar"></div>
+  </div>
+  
+  <div class="flex justify-between items-center mb-4">
+    <h2 id="question" class="text-lg font-semibold"></h2>
+    <span id="timer-display" class="text-blue-600 font-mono">30s</span>
+  </div>
+  
+  <div id="options" class="space-y-2"></div>
