@@ -3,304 +3,106 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Roshan Academy Quiz App</title>
-    <link rel="icon" type="image/x-icon" href="images/Faviocn.ico" />
-    <link
-      rel="stylesheet"
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"
-    />
-    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <title>Roshan Academy | Attendance</title>
+    <link rel="icon" type="image/x-icon" href="images/faviocn.ico" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
-      .hidden { display: none !important; }
-      .progress-container { width: 100%; background-color: #e0e0e0; border-radius: 8px; margin-bottom: 1rem; }
-      .progress-bar { height: 10px; width: 0%; background-color: #3b82f6; border-radius: 8px; transition: width 0.3s ease-in-out; }
-      #timer-display { font-weight: bold; transition: color 0.3s; }
-      .timer-low { color: #ef4444; animation: pulse 1s infinite; }
-      @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
-      .medal-icon { font-size: 4rem; margin-bottom: 1rem; display: inline-block; animation: bounce 1s ease infinite; }
-      .gold { color: #ffd700; text-shadow: 0 0 10px rgba(255, 215, 0, 0.5); }
-      .silver { color: #c0c0c0; text-shadow: 0 0 10px rgba(192, 192, 192, 0.5); }
-      .bronze { color: #cd7f32; text-shadow: 0 0 10px rgba(205, 127, 50, 0.5); }
-      @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+      @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap');
+      body { font-family: 'Inter', sans-serif; }
     </style>
   </head>
-  <body class="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat bg-fixed" style="background-image: url('images/Quiz Background.jpg')">
-    <div class="bg-white/95 backdrop-blur-sm p-8 rounded-xl shadow-2xl w-full max-w-md mx-4">
-      <h1 class="text-3xl font-bold text-center text-gray-800 mb-6">Roshan Academy</h1>
+  <body class="min-h-screen flex items-center justify-center bg-cover bg-center bg-no-repeat bg-fixed" style="background-image: url('images/Quiz-Background.jpg')">
+    <div class="absolute inset-0 bg-black/40 backdrop-blur-[2px]"></div>
 
-      <div id="auth-screen" class="space-y-4">
-        <h2 class="text-center text-gray-600 font-medium">Student Portal</h2>
-        <input type="text" id="auth-name" placeholder="Full Name" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none" />
-        <input type="email" id="auth-email" placeholder="Email" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none" />
-        <input type="password" id="auth-password" placeholder="Password" class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-blue-400 outline-none" />
-        <div class="flex gap-3">
-          <button id="login-btn" class="flex-1 bg-blue-600 text-white p-3 rounded-lg font-semibold hover:bg-blue-700 transition">Login</button>
-          <button id="signup-btn" class="flex-1 bg-gray-200 text-gray-700 p-3 rounded-lg font-semibold hover:bg-gray-300 transition">Register</button>
-        </div>
-        <p id="auth-message" class="text-red-500 text-sm text-center font-medium"></p>
+    <div id="login-screen" class="relative z-10 bg-white/95 backdrop-blur-md p-10 rounded-3xl shadow-2xl w-full max-w-md mx-4 transition-all duration-500">
+      <div class="text-center mb-8">
+        <h2 class="text-4xl font-extrabold text-blue-600 tracking-tighter">Roshan Academy</h2>
+        <p class="text-gray-400 mt-1 font-bold uppercase text-[10px] tracking-[0.2em]">Attendance System</p>
       </div>
-
-      <div id="selection-screen" class="hidden space-y-4">
-        <div class="flex justify-end">
-          <button id="logout-btn" class="text-sm font-semibold text-red-500 hover:text-red-700 transition flex items-center gap-1">
-            <i class="fas fa-sign-out-alt"></i> Logout
-          </button>
-        </div>
-        <h2 class="text-xl font-semibold text-center text-gray-700">Maharashtra Board Quiz</h2>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Select Standard:</label>
-          <select id="standard" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg bg-white">
-            <option value="">Select Standard</option>
-            <option value="1">1st Standard</option><option value="2">2nd Standard</option><option value="3">3rd Standard</option>
-            <option value="4">4th Standard</option><option value="5">5th Standard</option><option value="6">6th Standard</option>
-            <option value="7">7th Standard</option><option value="8">8th Standard</option><option value="9">9th Standard</option>
-            <option value="10">10th Standard</option>
-          </select>
-        </div>
-
-        <div>
-          <label class="block text-sm font-medium text-gray-700">Select Subject:</label>
-          <select id="subject" class="mt-1 block w-full p-3 border border-gray-300 rounded-lg bg-white">
-            <option value="">Select Subject</option>
-          </select>
-        </div>
-
-        <button id="start-quiz" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition uppercase tracking-wide">Start Quiz</button>
-        <p id="selection-feedback" class="text-center text-red-500 font-medium"></p>
-
-        <div id="admin-link-container" class="hidden pt-4 border-t text-center">
-          <button id="go-to-admin" class="text-xs text-gray-400 hover:text-blue-500 transition">
-            <i class="fas fa-lock"></i> Admin Dashboard
-          </button>
-        </div>
+      <div class="relative mb-6">
+        <input type="password" id="master-pass" placeholder="Master Password" class="w-full p-4 bg-gray-50 border-none ring-1 ring-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none text-center text-lg font-semibold transition-all" />
+        <button id="toggle-password" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-blue-600"><i class="fas fa-eye"></i></button>
       </div>
-
-      <div id="admin-screen" class="hidden space-y-4">
-        <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">Admin Panel</h2>
-          <button id="admin-back" class="text-blue-600 text-sm hover:underline">Back</button>
-        </div>
-        <div class="bg-gray-50 p-4 rounded-lg border border-dashed border-gray-300">
-          <p class="text-sm text-gray-600 mb-4">Click below to generate an Excel report of all student quiz attempts.</p>
-          <button onclick="exportToExcel()" class="w-full bg-green-600 text-white p-3 rounded-lg font-bold hover:bg-green-700 transition flex items-center justify-center gap-2">
-            <i class="fas fa-file-excel"></i> Export Results to Excel
-          </button>
-        </div>
-      </div>
-
-      <div id="quiz-screen" class="hidden">
-        <div class="progress-container"><div id="progress-bar" class="progress-bar"></div></div>
-        <div class="flex justify-between items-center mb-6">
-          <h2 id="question" class="text-lg font-bold text-gray-800 pr-4 leading-tight"></h2>
-          <span id="timer-display" class="text-blue-600 font-mono font-bold text-2xl min-w-[60px] text-right">30s</span>
-        </div>
-        <div id="options" class="grid grid-cols-1 gap-3"></div>
-        <button id="next-question" class="mt-6 w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 hidden">Next Question</button>
-        <p id="quiz-feedback" class="mt-4 text-center font-bold"></p>
-      </div>
-
-      <div id="result-screen" class="hidden text-center">
-        <div id="medal-container"></div>
-        <h2 class="text-2xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
-        <p id="result-text" class="text-lg text-gray-600 mb-6"></p>
-        <button id="restart-quiz" class="w-full bg-blue-600 text-white p-3 rounded-lg font-bold hover:bg-blue-700 transition">Restart Quiz</button>
-      </div>
+      <button id="enter-btn" class="w-full bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-2xl font-bold text-lg shadow-lg shadow-blue-200 transition-all active:scale-95">Unlock Tracker</button>
+      <p id="login-error" class="text-red-500 mt-4 text-center text-sm font-bold hidden animate-pulse"><i class="fas fa-exclamation-circle mr-1"></i> Access Denied!</p>
     </div>
 
-    <script src="quizData.js"></script>
-    <script type="module">
-      import { initializeApp, getApp, getApps } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-      import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, updateProfile } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-      import { getFirestore, collection, addDoc, getDocs, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+    <div id="attendance-screen" class="hidden relative z-10 bg-white p-6 md:p-10 rounded-[2.5rem] shadow-2xl w-full max-w-4xl mx-4 my-8 transition-all duration-500">
+      
+      <div class="flex flex-col md:flex-row justify-between items-start gap-6 mb-10 pb-8 border-b border-gray-100">
+        <div class="flex items-center gap-4">
+          <div>
+            <h2 class="text-3xl font-black text-gray-800 leading-none">Attendance<br><span class="text-blue-600">Tracker</span></h2>
+            <button id="lock-btn" class="mt-4 flex items-center text-[10px] font-black text-gray-400 uppercase tracking-widest hover:text-red-500 transition-colors bg-gray-50 px-3 py-2 rounded-xl">
+              <i class="fas fa-lock mr-2"></i> Lock App
+            </button>
+          </div>
+        </div>
 
-      const firebaseConfig = {
-        apiKey: "AIzaSyCnY-wJzabkuvFD5v1eUpZyY_Gx0FPv4zI",
-        authDomain: "roshan-academy.firebaseapp.com",
-        projectId: "roshan-academy",
-        storageBucket: "roshan-academy.firebasestorage.app",
-        messagingSenderId: "644092003401",
-        appId: "1:644092003401:web:f195aab704a3280ecb6b98",
-      };
+        <div class="bg-blue-50/50 border border-blue-100 p-5 rounded-[2rem] w-full md:w-auto">
+          <div class="flex justify-between items-center mb-3">
+            <span class="text-[10px] font-black text-blue-600 uppercase tracking-widest">Manage Students</span>
+            <button id="export-btn" class="bg-amber-500 hover:bg-amber-600 text-white px-4 py-2 rounded-xl font-bold text-xs shadow-md transition-all flex items-center gap-2">
+              <i class="fas fa-file-excel"></i> Export to Excel
+            </button>
+          </div>
+          <div class="flex gap-2">
+            <input type="number" id="new-roll" placeholder="Roll" class="w-16 p-3 rounded-xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-bold" />
+            <input type="text" id="new-name" placeholder="Student Name" class="flex-1 md:w-48 p-3 rounded-xl border-none ring-1 ring-gray-200 focus:ring-2 focus:ring-blue-500 text-sm font-medium" />
+            <button id="add-student-btn" onclick="addStudent()" class="bg-blue-600 text-white px-5 rounded-xl hover:bg-blue-700 shadow-md transition-all">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+        </div>
+      </div>
 
-      const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-      const auth = getAuth(app);
-      const db = getFirestore(app);
-      const ADMIN_EMAIL = "rkjha7281@gmail.com";
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Select Date</label>
+          <input type="date" id="attendance-date" class="w-full p-4 bg-gray-50 border-none ring-1 ring-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none font-bold text-gray-700" />
+        </div>
+        <div class="space-y-2">
+          <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-2">Standard / Class</label>
+          <div class="relative">
+            <select id="attendance-std" class="w-full p-4 bg-gray-50 border-none ring-1 ring-gray-200 rounded-2xl focus:ring-2 focus:ring-blue-500 outline-none appearance-none font-bold text-gray-700 cursor-pointer">
+              <option value="1">1st Standard</option>
+              <option value="2">2nd Standard</option>
+              <option value="3">3rd Standard</option>
+              <option value="4">4th Standard</option>
+              <option value="5">5th Standard</option>
+              <option value="6">6th Standard</option>
+              <option value="7">7th Standard</option>
+              <option value="8">8th Standard</option>
+              <option value="9">9th Standard</option>
+              <option value="10">10th Standard</option>
+            </select>
+            <i class="fas fa-chevron-down absolute right-5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+          </div>
+        </div>
+      </div>
 
-      document.addEventListener("DOMContentLoaded", () => {
-        // UI Elements
-        const authScreen = document.getElementById("auth-screen");
-        const selectionScreen = document.getElementById("selection-screen");
-        const adminScreen = document.getElementById("admin-screen");
-        const quizScreen = document.getElementById("quiz-screen");
-        const resultScreen = document.getElementById("result-screen");
-        const adminLinkContainer = document.getElementById("admin-link-container");
-        
-        // Buttons
-        const loginBtn = document.getElementById("login-btn");
-        const signupBtn = document.getElementById("signup-btn");
-        const logoutBtn = document.getElementById("logout-btn");
-        const goToAdminBtn = document.getElementById("go-to-admin");
-        const adminBackBtn = document.getElementById("admin-back");
-        const startQuizBtn = document.getElementById("start-quiz");
-        const nextBtn = document.getElementById("next-question");
-        const restartBtn = document.getElementById("restart-quiz");
+      <div class="overflow-hidden ring-1 ring-gray-100 rounded-[2rem] mb-8 shadow-sm">
+        <table class="w-full text-left">
+          <thead>
+            <tr class="bg-gray-50/50 border-b border-gray-100">
+              <th class="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Roll No</th>
+              <th class="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest">Student Name</th>
+              <th class="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-center">Status</th>
+              <th class="p-5 text-[10px] font-black text-gray-400 uppercase tracking-widest text-right">Action</th>
+            </tr>
+          </thead>
+          <tbody id="attendance-body" class="divide-y divide-gray-50">
+            </tbody>
+        </table>
+      </div>
 
-        let currentStandard = "", currentSubject = "", currentQuestionIndex = 0, score = 0, questions = [], timer;
+      <button id="save-attendance" class="w-full bg-green-600 hover:bg-green-700 text-white p-5 rounded-2xl font-black text-lg shadow-xl shadow-green-100 transition-all flex items-center justify-center gap-3 active:scale-[0.98]">
+        Save Attendance <i class="fas fa-check-circle"></i>
+      </button>
+    </div>
 
-        // Auth Logic
-        onAuthStateChanged(auth, (user) => {
-          if (user) {
-            authScreen.classList.add("hidden");
-            selectionScreen.classList.remove("hidden");
-            // Show Admin Link if email matches
-            if (user.email === ADMIN_EMAIL) adminLinkContainer.classList.remove("hidden");
-          } else {
-            authScreen.classList.remove("hidden");
-            selectionScreen.classList.add("hidden");
-            adminScreen.classList.add("hidden");
-            quizScreen.classList.add("hidden");
-            resultScreen.classList.add("hidden");
-          }
-        });
-
-        loginBtn.onclick = async () => {
-          const email = document.getElementById("auth-email").value;
-          const pass = document.getElementById("auth-password").value;
-          try { await signInWithEmailAndPassword(auth, email, pass); } 
-          catch (error) { document.getElementById("auth-message").textContent = "Invalid Credentials"; }
-        };
-
-        signupBtn.onclick = async () => {
-          const email = document.getElementById("auth-email").value.trim();
-          const pass = document.getElementById("auth-password").value;
-          const name = document.getElementById("auth-name").value.trim();
-          if (!name) return alert("Enter Name");
-          try {
-            const res = await createUserWithEmailAndPassword(auth, email, pass);
-            await updateProfile(res.user, { displayName: name });
-            alert("Registered!");
-          } catch (error) { document.getElementById("auth-message").textContent = error.message; }
-        };
-
-        logoutBtn.onclick = () => auth.signOut();
-        goToAdminBtn.onclick = () => { selectionScreen.classList.add("hidden"); adminScreen.classList.remove("hidden"); };
-        adminBackBtn.onclick = () => { adminScreen.classList.add("hidden"); selectionScreen.classList.remove("hidden"); };
-
-        // Quiz Logic
-        startQuizBtn.onclick = () => {
-          currentStandard = document.getElementById("standard").value;
-          currentSubject = document.getElementById("subject").value;
-          if (!currentStandard || !currentSubject) return alert("Select Standard & Subject");
-          questions = (quizData[currentStandard] && quizData[currentStandard][currentSubject]) || [];
-          if (questions.length === 0) return alert("No questions found");
-          questions = [...questions].sort(() => Math.random() - 0.5);
-          currentQuestionIndex = 0; score = 0;
-          selectionScreen.classList.add("hidden");
-          quizScreen.classList.remove("hidden");
-          showQuestion();
-        };
-
-        function showQuestion() {
-          const q = questions[currentQuestionIndex];
-          document.getElementById("progress-bar").style.width = (currentQuestionIndex / questions.length) * 100 + "%";
-          document.getElementById("question").textContent = `Q${currentQuestionIndex + 1}: ${q.question}`;
-          const optionsBox = document.getElementById("options");
-          optionsBox.innerHTML = "";
-          q.options.forEach(opt => {
-            const btn = document.createElement("button");
-            btn.textContent = opt;
-            btn.className = "w-full p-3 border-2 border-gray-200 rounded-xl hover:bg-blue-50 text-left font-medium";
-            btn.onclick = () => checkAnswer(opt);
-            optionsBox.appendChild(btn);
-          });
-          nextBtn.classList.add("hidden");
-          startTimer();
-        }
-
-        function startTimer() {
-          let left = 30;
-          const display = document.getElementById("timer-display");
-          display.textContent = left + "s";
-          display.classList.remove("timer-low");
-          clearInterval(timer);
-          timer = setInterval(() => {
-            left--; display.textContent = left + "s";
-            if (left <= 5) display.classList.add("timer-low");
-            if (left <= 0) { clearInterval(timer); checkAnswer(null); }
-          }, 1000);
-        }
-
-        function checkAnswer(selected) {
-          clearInterval(timer);
-          const q = questions[currentQuestionIndex];
-          const btns = document.getElementById("options").querySelectorAll("button");
-          btns.forEach(b => {
-            b.disabled = true;
-            if (b.textContent === q.answer) b.classList.add("bg-green-100", "border-green-500");
-            if (b.textContent === selected && selected !== q.answer) b.classList.add("bg-red-100", "border-red-500");
-          });
-          if (selected === q.answer) score++;
-          nextBtn.classList.remove("hidden");
-        }
-
-        nextBtn.onclick = () => {
-          currentQuestionIndex++;
-          if (currentQuestionIndex < questions.length) showQuestion();
-          else showResult();
-        };
-
-        async function showResult() {
-          quizScreen.classList.add("hidden");
-          resultScreen.classList.remove("hidden");
-          const percent = (score / questions.length) * 100;
-          let medal = percent < 50 ? "bronze" : percent < 80 ? "silver" : "gold";
-          document.getElementById("medal-container").innerHTML = `<i class="fas fa-medal medal-icon ${medal}"></i>`;
-          document.getElementById("result-text").innerHTML = `<span class="text-blue-600 font-bold">${auth.currentUser.displayName}</span><br><span class="text-3xl font-bold">${score} / ${questions.length}</span>`;
-          
-          await addDoc(collection(db, "quiz_results"), {
-            name: auth.currentUser.displayName,
-            email: auth.currentUser.email,
-            std: currentStandard,
-            sub: currentSubject,
-            score: score,
-            total: questions.length,
-            at: serverTimestamp()
-          });
-        }
-
-        restartBtn.onclick = () => { resultScreen.classList.add("hidden"); selectionScreen.classList.remove("hidden"); };
-
-        // Excel Export
-        window.exportToExcel = async () => {
-          try {
-            const snap = await getDocs(collection(db, "quiz_results"));
-            const data = snap.docs.map(doc => {
-              const r = doc.data();
-              return { ...r, at: r.at ? r.at.toDate().toLocaleString() : "" };
-            });
-            if (data.length === 0) return alert("No data");
-            const ws = XLSX.utils.json_to_sheet(data);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Results");
-            XLSX.writeFile(wb, "Roshan_Academy_Data.xlsx");
-          } catch (e) { alert("Export failed"); }
-        };
-
-        document.getElementById("standard").onchange = (e) => {
-          const subSel = document.getElementById("subject");
-          subSel.innerHTML = '<option value="">Select Subject</option>';
-          if (e.target.value && quizData[e.target.value]) {
-            Object.keys(quizData[e.target.value]).forEach(s => {
-              const opt = document.createElement("option");
-              opt.value = opt.textContent = s;
-              subSel.appendChild(opt);
-            });
-          }
-        };
-      });
-    </script>
+    <script type="module" src="index.js"></script>
   </body>
 </html>
